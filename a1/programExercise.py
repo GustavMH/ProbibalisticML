@@ -1,12 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Random seed for reproducibility
 np.random.seed(42)
-theta = np.array([-1, 1])
-N = 20
+
+# Function for plotting in 3D
+def plot(x, x_label, y, y_label, z, z_label, name):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection="3d")
+    ax.plot_trisurf(x, y, z, cmap="viridis")
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_zlabel(z_label)
+    plt.savefig(f"{name}.png")
 
 
 # Task A
+
+# Parameters
+theta = np.array([-1, 1])
+N = 20
 
 # Distribution of the inputs.
 input_mean = np.array([0, 0])
@@ -39,34 +52,29 @@ prior_covariance = np.identity(2)
 posterior_mean = prior_covariance @ X.T @ np.linalg.inv(label_variance * np.identity(N) + X @ prior_covariance @ X.T) @ y
 posterior_covariance = prior_covariance - prior_covariance @ X.T @ np.linalg.inv(label_variance * np.identity(N) + X @ prior_covariance @ X.T) @ X @ prior_covariance
 
-
-# Parameter pairs.
-values = np.linspace(-3, 3, 200)
-theta_1, theta_2 = np.array([(a, b) for a in values for b in values]).T
-
-# Posterior PDF
-difference = np.stack([theta_1, theta_2], axis=-1) - posterior_mean
-exponent = -0.5 * np.sum((difference @ np.linalg.inv(posterior_covariance)) * difference, axis=-1)
-density = np.exp(exponent) / (2 * np.pi * np.sqrt(np.linalg.det(posterior_covariance)))
-
-
-name = "posterior_density"
-# Plot.
-fig = plt.figure()
-ax = fig.add_subplot(projection="3d")
-ax.plot_trisurf(theta_1, theta_2, density, cmap="viridis")
-ax.set_xlabel(r"$\theta_1$")
-ax.set_ylabel(r"$\theta_2$")
-ax.set_zlabel("Posterior density")
-plt.savefig(f"{name}.png")
-
+# Printing the posterior mean and covariance.
 print("")
 print("Task B - Posterior distribution over the parameters:")
 print("Posterior mean:")
 print(posterior_mean)
 print("Posterior covariance:")
 print(posterior_covariance)
+
+# Parameter pairs.
+values = np.linspace(-3, 3, 200)
+theta_1, theta_2 = np.array([(a, b) for a in values for b in values]).T
+
+# Posterior PDF for the plot
+difference = np.stack([theta_1, theta_2], axis=-1) - posterior_mean
+exponent = -0.5 * np.sum((difference @ np.linalg.inv(posterior_covariance)) * difference, axis=-1)
+density = np.exp(exponent) / (2 * np.pi * np.sqrt(np.linalg.det(posterior_covariance)))
+
+# Plotting the posterior density.
+name = "posterior_density"
+plot(theta_1, r"$\theta_1$", theta_2, r"$\theta_2$", density, "Posterior density", name)
 print(f"Posterior density plot saved as '{name}.png'.")
+
+
 
 
 # Task C - Predictive postrior distribution over the labels.
@@ -87,22 +95,11 @@ print(posterior_predictive_variance)
 values = np.linspace(-3, 3, 200)
 x_1, x_2 = np.array([(a, b) for a in values for b in values]).T
 X_grid = np.stack([x_1, x_2], axis=-1)
+posterior_predictive_variances_plot = label_variance + np.diag(X_grid @ posterior_covariance @ X_grid.T) # Posterior predictive variances for the plot
 
-# Posterior predictive variance.
-posterior_predictive_variances_plot = label_variance + np.sum(
-    (X_grid @ posterior_covariance) * X_grid, axis=-1
-)
-
+# Plotting the posterior predictive variance.
 name = "posterior_predictive_variance"
-# Plot.
-fig = plt.figure()
-ax = fig.add_subplot(projection="3d")
-ax.plot_trisurf(x_1, x_2, posterior_predictive_variances_plot, cmap="viridis")
-ax.set_xlabel(r"$x_1$")
-ax.set_ylabel(r"$x_2$")
-ax.set_zlabel("Posterior predictive variance")
-plt.savefig(f"{name}.png")
-
+plot(x_1, r"$x_1$", x_2, r"$x_2$", posterior_predictive_variances_plot, "Posterior predictive variance", name)
 print(f"Posterior predictive variance plot saved as '{name}.png'.")
 
 
