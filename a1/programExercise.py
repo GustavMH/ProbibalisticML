@@ -112,13 +112,7 @@ print(f"Posterior predictive variance plot saved as '{file_name2}.png'.")
 
 
 
-
-
-
-
-# TODO: Task D
-# Task D 
-
+# Task D
 
 # Task D.A
 

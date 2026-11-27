@@ -257,7 +257,7 @@ def plot_latent_grid(k=15):
     grid = images.permute(0, 2, 1, 3).reshape(k * 28, k * 28)
 
     # Plot the grid
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(10, 8))
     plt.imshow(grid, cmap="gray", vmin=0, vmax=1)
 
     # Place ticks at the center of each image
